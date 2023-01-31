@@ -5,8 +5,10 @@
 
 year=$1;
 category="bollywood-mp3-songs"
-audio_quality="128 KBPS"
-downloader="aria2c"
+audio_quality="320 KBPS"
+downloader="aria2c -d $year"
+
+mkdir -p $year
 
 
 
@@ -18,6 +20,10 @@ function get_pages {
   current_page=1
   last_page=$(curl -s $1/$current_page/$2 | pup 'div.pagination' | pup 'a attr{href}' | tail -1 | rev | cut -d'/' -f2 | rev); # $1 $2= $url $year
 
+  if ! expr "$last_page" + 0 > /dev/null 2>&1; then
+    last_page=1;
+  fi
+  
   while [ $current_page -le $last_page ];
   do
     get_album "$1/$current_page/$2"
@@ -55,7 +61,7 @@ function download_song {
 # get_song "https://pagalnew.com/songs/pyaar-hona-na-tha-jubin-nautiyal.html"
 
 ## To get very latest song:
-# get_album "https://pagalnew.com/"
+#get_song $baseurl
 
 ## Main Usage:
 get_pages $categoryurl $year
